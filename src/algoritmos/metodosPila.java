@@ -39,4 +39,14 @@ public class metodosPila {
         PasarPila(aux, pila);
     }
 
+    public static int SumarElementosPila(PilaTDA p){
+        int suma = 0;
+        while (!p.PilaVacia()){
+            suma = suma + p.Tope();
+            p.Desapilar();
+        }
+        return suma;
+
+    }
+
 }
