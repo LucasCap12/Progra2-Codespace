@@ -29,6 +29,14 @@ public class metodosPila {
     public static void MostrarPila(PilaTDA pila){
         PilaTDA aux = new PilaDinamica();
         aux.InicializarPila();
+
+        while (!pila.PilaVacia()){
+            System.out.println(pila.Tope());
+            aux.Apilar(pila.Tope());
+            pila.Desapilar();
+        }
+
+        PasarPila(aux, pila);
     }
 
 }

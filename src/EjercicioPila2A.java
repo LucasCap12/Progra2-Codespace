@@ -13,6 +13,11 @@ public class EjercicioPila2A {
         PilaTDA p2 = new PilaDinamica();
         p2.InicializarPila();
 
+        metodosPila.CopiarPila(p1, p2);
+
+        System.out.println("Pila 1");
         metodosPila.MostrarPila(p1);
+        System.out.println("Pila 2");
+        metodosPila.MostrarPila(p2);
     }
 }
