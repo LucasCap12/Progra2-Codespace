@@ -19,3 +19,11 @@ public class App {
 
     }
 }
+
+/*
+public class ConjuntoEstatica implements ConjutoTDA{
+    public int Elegir(){
+    return(vector[Math.abs((int)System.nanoTime()%i)]);
+    } 
+}
+*/
