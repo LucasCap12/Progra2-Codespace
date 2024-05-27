@@ -1,4 +1,4 @@
-package EjercicioSimulacro2.api;
+package EjercicioSimulacro.api;
 
 public interface PilaColaParesTDA {
     void inicializar();
