@@ -1,8 +1,5 @@
 package TrabajoPractico.api;
 
-/**
- * Interface para el manejo de una provincia.
- */
 public interface ProvinciaTDA {
     void InicializarProvincia(String nombre); // Inicializa la provincia con un nombre
     String Nombre(); // Devuelve el nombre de la provincia

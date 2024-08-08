@@ -1,0 +1,54 @@
+Ejercicio 1: Lista Doblemente Enlazada
+Estrategias Utilizadas:
+
+Agregar: Para agregar un nuevo nodo, se inserta al final de la lista, ajustando los punteros sig y prev de los nodos correspondientes.
+Eliminar: Para eliminar un nodo con un valor específico, se recorre la lista buscando el nodo y se ajustan los punteros sig y prev de los nodos vecinos.
+EliminarTodos: Similar a Eliminar, pero se continúa recorriendo la lista y eliminando todos los nodos con el valor específico.
+MostrarCabezaCola y MostrarColaCabeza: Para imprimir la lista, se recorre desde la cabeza a la cola o desde la cola a la cabeza, respectivamente, imprimiendo los valores de los nodos.
+
+Ejercicio 2: Eliminar Repetidos en una Cola
+Estrategias Utilizadas:
+Eliminar Repetidos: Utiliza una cola auxiliar para almacenar elementos únicos y un conjunto para verificar si un elemento ya fue visto. Se recorren los elementos de la cola original, y si un elemento no está en el conjunto, se agrega a la cola auxiliar y al conjunto.
+
+Ejercicio 3: Pila a Diccionario
+Estrategias Utilizadas:
+ElementosPilaADiccionario: Utiliza un diccionario para contar las apariciones de cada elemento en la pila. Se recorre la pila, y por cada elemento, se incrementa su contador en el diccionario. Luego, se reconstruye la pila desde el auxiliar para mantener su estado original.
+
+Ejercicio 4: Suma de Impares y Conteo de Hojas Pares en un ABB
+Estrategias Utilizadas:
+calcularSumaImparesYHojasPares: Implementa una función recursiva que visita cada nodo del ABB. Acumula la suma de los valores impares y cuenta las hojas con valores pares. Combina los resultados de los subárboles izquierdo y derecho para obtener los resultados finales.
+
+COSTOS TEMPORALES:
+
+EJERCICIO 1- Listas doblemente enlazadas:
+
+5. Costo de los Métodos:
+
+Agregar(int num):
+Costo: O(1)
+Explicación: Agregar un elemento a la cola de la lista requiere constantes operaciones de asignación.
+
+Eliminar(int num):
+Costo: O(n)
+Explicación: En el peor caso, se debe recorrer toda la lista para encontrar y eliminar la primera ocurrencia del elemento.
+
+EliminarTodos(int num):
+Costo: O(n)
+Explicación: En el peor caso, se debe recorrer toda la lista y eliminar cada ocurrencia del elemento.
+
+MostrarCabezaCola() y MostrarColaCabeza():
+Costo: O(n)
+Explicación: Se debe recorrer toda la lista para mostrar los elementos.
+
+
+Ejercicio 2: Eliminar Repetidos en ColaTDA
+Costo Temporal: (O(n^2))
+Explicación: Para cada elemento en la cola original, se verifica su presencia en el conjunto (costo (O(n)) en el peor caso) y luego se agrega a la cola de destino si no es repetido.
+
+Ejercicio 3: Contar Elementos en PilaTDA usando DiccionarioSimpleTDA
+Costo Temporal: (O(n^2))
+Explicación: Para cada elemento en la pila, se verifica su presencia en el diccionario (costo (O(n)) en el peor caso) y se actualiza su contador. La verificación de la existencia de una clave en el diccionario es lineal en el número de claves almacenadas.
+
+Ejercicio 4: Sumar Elementos Impares y Contar Hojas Pares en ABB
+Costo Temporal: (O(n))
+Explicación: Se requiere recorrer todos los nodos del ABB una vez. Durante el recorrido, se suman los elementos impares y se cuentan las hojas pares.

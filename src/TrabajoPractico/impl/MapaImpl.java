@@ -4,131 +4,120 @@ import TrabajoPractico.api.ConjuntoTDA;
 import TrabajoPractico.api.GrafoTDA;
 import TrabajoPractico.api.MapaTDA;
 import TrabajoPractico.api.PilaTDA;
-
-import java.util.HashMap;
-import java.util.Map;
+import TrabajoPractico.impl.PilaLD;
 
 public class MapaImpl implements MapaTDA {
-    private GrafoTDA mapa;
-    private ConjuntoTDA provincias;
-    private Map<Integer, String> nombreProvincias;
-    private Map<Integer, String> nombreCiudades;
+    private GrafoTDA grafo;
+    private Provincia[] provincias;
+    private int provinciaIndex;
 
     @Override
     public void InicializarMapa() {
-        mapa = new GrafoMA();  // Asegúrate de que GrafoMA implementa GrafoTDA
-        mapa.InicializarGrafo();
-        provincias = new ConjuntoLD();  // Asegúrate de que ConjuntoLD implementa ConjuntoTDA
-        provincias.InicializarConjunto();
-        nombreProvincias = new HashMap<>();
-        nombreCiudades = new HashMap<>();
+        grafo = new GrafoMA();
+        grafo.InicializarGrafo();
+        provincias = new Provincia[100];
+        provinciaIndex = 0;
     }
 
     @Override
     public void CargarProvincia(String provincia) {
-        int provHash = provincia.hashCode();
-        if (!provincias.Pertenece(provHash)) {
-            provincias.Agregar(provHash);
-            nombreProvincias.put(provHash, provincia);
-        }
+        Provincia p = new Provincia();
+        p.InicializarProvincia();
+        p.nombre = provincia;
+        provincias[provinciaIndex++] = p;
     }
 
     @Override
     public void CargarCiudad(String provincia, String ciudad) {
-        int ciudadHash = ciudad.hashCode();
-        if (!mapa.Vertices().Pertenece(ciudadHash)) {
-            mapa.AgregarVertice(ciudadHash);
-            nombreCiudades.put(ciudadHash, ciudad);
+        for (int i = 0; i < provinciaIndex; i++) {
+            if (provincias[i].nombre.equals(provincia)) {
+                int ciudadHash = ciudad.hashCode();
+                provincias[i].AgregarCiudad(ciudadHash, ciudad);
+                grafo.AgregarVertice(ciudadHash);
+                break;
+            }
         }
     }
 
     @Override
     public void EliminarCiudad(String ciudad) {
         int ciudadHash = ciudad.hashCode();
-        if (mapa.Vertices().Pertenece(ciudadHash)) {
-            mapa.EliminarVertice(ciudadHash);
-            nombreCiudades.remove(ciudadHash);
+        for (int i = 0; i < provinciaIndex; i++) {
+            if (provincias[i].ciudades.Pertenece(ciudadHash)) {
+                provincias[i].ciudades.Sacar(ciudadHash);
+                grafo.EliminarVertice(ciudadHash);
+                break;
+            }
         }
     }
 
     @Override
     public void CargarRuta(String origen, String destino, int distancia) {
-        int origenHash = origen.hashCode();
-        int destinoHash = destino.hashCode();
-        if (mapa.Vertices().Pertenece(origenHash) && mapa.Vertices().Pertenece(destinoHash)) {
-            mapa.AgregarArista(origenHash, destinoHash, distancia);
-        }
+        grafo.AgregarArista(origen.hashCode(), destino.hashCode(), distancia);
     }
 
     @Override
     public void ListarProvincias() {
-        ConjuntoTDA provs = provincias;
-        while (!provs.ConjuntoVacio()) {
-            int prov = provs.Elegir();
-            System.out.println(String.format("Provincia: %s", nombreProvincias.get(prov)));
-            provs.Sacar(prov);
+        for (int i = 0; i < provinciaIndex; i++) {
+            System.out.println(provincias[i].nombre);
         }
     }
 
     @Override
     public void ListarCiudadesPorProvincia(String provincia) {
-        // Necesita implementar un mapeo real para provincias y ciudades
+        for (int i = 0; i < provinciaIndex; i++) {
+            if (provincias[i].nombre.equals(provincia)) {
+                ConjuntoTDA ciudades = provincias[i].ciudades;
+                while (!ciudades.ConjuntoVacio()) {
+                    int ciudad = ciudades.Elegir();
+                    System.out.println("Ciudad: " + provincias[i].getCiudadNombre(ciudad));
+                    ciudades.Sacar(ciudad);
+                }
+                break;
+            }
+        }
     }
 
     @Override
     public void ListarCiudadesVecinas(String ciudad) {
-        int ciudadHash = ciudad.hashCode();
-        if (mapa.Vertices().Pertenece(ciudadHash)) {
-            ConjuntoTDA adyacentes = mapa.VerticesAdyacentes(ciudadHash);
-            while (!adyacentes.ConjuntoVacio()) {
-                int vecino = adyacentes.Elegir();
-                System.out.println(String.format("Ciudad vecina: %s", nombreCiudades.get(vecino)));
-                adyacentes.Sacar(vecino);
-            }
+        ConjuntoTDA vecinas = grafo.VerticesAdyacentes(ciudad.hashCode());
+        while (!vecinas.ConjuntoVacio()) {
+            int ciudadVecina = vecinas.Elegir();
+            System.out.println("Ciudad vecina: " + getCiudadNombre(ciudadVecina));
+            vecinas.Sacar(ciudadVecina);
         }
     }
 
     @Override
     public void ListarCiudadesPuente(String ciudadA, String ciudadB) {
-        int ciudadAHash = ciudadA.hashCode();
-        int ciudadBHash = ciudadB.hashCode();
-        if (mapa.Vertices().Pertenece(ciudadAHash) && mapa.Vertices().Pertenece(ciudadBHash)) {
-            ConjuntoTDA adyacentesA = mapa.VerticesAdyacentes(ciudadAHash);
-            while (!adyacentesA.ConjuntoVacio()) {
-                int puente = adyacentesA.Elegir();
-                if (mapa.VerticesAdyacentes(puente).Pertenece(ciudadBHash)) {
-                    System.out.println(String.format("Ciudad puente: %s", nombreCiudades.get(puente)));
-                    int distancia = mapa.PesoArista(ciudadAHash, puente) + mapa.PesoArista(puente, ciudadBHash);
-                    System.out.println(String.format("Distancia total: %d km", distancia));
-                }
-                adyacentesA.Sacar(puente);
+        ConjuntoTDA adyacentesA = grafo.VerticesAdyacentes(ciudadA.hashCode());
+        while (!adyacentesA.ConjuntoVacio()) {
+            int puente = adyacentesA.Elegir();
+            if (grafo.ExistenArista(puente, ciudadB.hashCode())) {
+                System.out.println("Ciudad puente: " + getCiudadNombre(puente));
             }
+            adyacentesA.Sacar(puente);
         }
     }
 
     @Override
     public void ListarCiudadesPredecesoras(String ciudad) {
-        int ciudadHash = ciudad.hashCode();
-        if (mapa.Vertices().Pertenece(ciudadHash)) {
-            ConjuntoTDA vertices = mapa.Vertices();
-            while (!vertices.ConjuntoVacio()) {
-                int vertice = vertices.Elegir();
-                if (mapa.ExistenArista(vertice, ciudadHash)) {
-                    System.out.println(String.format("Ciudad predecesora: %s", nombreCiudades.get(vertice)));
-                }
-                vertices.Sacar(vertice);
-            }
+        ConjuntoTDA predecesoras = grafo.VerticesPredecesores(ciudad.hashCode());
+        while (!predecesoras.ConjuntoVacio()) {
+            int predecesora = predecesoras.Elegir();
+            System.out.println("Ciudad predecesora: " + getCiudadNombre(predecesora));
+            predecesoras.Sacar(predecesora);
         }
     }
 
     @Override
     public void ListarCiudadesExtremo() {
-        ConjuntoTDA vertices = mapa.Vertices();
+        ConjuntoTDA vertices = grafo.Vertices();
         while (!vertices.ConjuntoVacio()) {
             int vertice = vertices.Elegir();
-            ConjuntoTDA adyacentes = mapa.VerticesAdyacentes(vertice);
+            ConjuntoTDA adyacentes = grafo.VerticesAdyacentes(vertice);
             if (adyacentes.ConjuntoVacio()) {
-                System.out.println(String.format("Ciudad extremo: %s", nombreCiudades.get(vertice)));
+                System.out.println("Ciudad extremo: " + getCiudadNombre(vertice));
             }
             vertices.Sacar(vertice);
         }
@@ -136,14 +125,14 @@ public class MapaImpl implements MapaTDA {
 
     @Override
     public void ListarCiudadesFuertementeConectadas() {
-        ConjuntoTDA vertices = mapa.Vertices();
+        ConjuntoTDA vertices = grafo.Vertices();
         while (!vertices.ConjuntoVacio()) {
             int vertice = vertices.Elegir();
-            ConjuntoTDA adyacentes = mapa.VerticesAdyacentes(vertice);
+            ConjuntoTDA adyacentes = grafo.VerticesAdyacentes(vertice);
             while (!adyacentes.ConjuntoVacio()) {
                 int adyacente = adyacentes.Elegir();
-                if (mapa.ExistenArista(adyacente, vertice)) {
-                    System.out.println(String.format("Ciudades fuertemente conectadas: %s y %s", nombreCiudades.get(vertice), nombreCiudades.get(adyacente)));
+                if (grafo.ExistenArista(adyacente, vertice)) {
+                    System.out.println("Ciudades fuertemente conectadas: " + getCiudadNombre(vertice) + " y " + getCiudadNombre(adyacente));
                 }
                 adyacentes.Sacar(adyacente);
             }
@@ -153,79 +142,56 @@ public class MapaImpl implements MapaTDA {
 
     @Override
     public void CalcularCamino(String ciudadA, String ciudadB) {
-        int ciudadAHash = ciudadA.hashCode();
-        int ciudadBHash = ciudadB.hashCode();
-        if (mapa.Vertices().Pertenece(ciudadAHash) && mapa.Vertices().Pertenece(ciudadBHash)) {
-            ConjuntoTDA visitados = new ConjuntoLD();  // Asegúrate de que ConjuntoLD implementa ConjuntoTDA
-            visitados.InicializarConjunto();
-            PilaTDA camino = new PilaLD();  // Asegúrate de que PilaLD implementa PilaTDA
-            camino.InicializarPila();
-            int distanciaTotal = CalcularCaminoAux(ciudadAHash, ciudadBHash, visitados, camino, 0);
-            if (distanciaTotal != -1) {
-                System.out.println(String.format("Distancia total: %d km", distanciaTotal));
-                while (!camino.PilaVacia()) {
-                    System.out.println(String.format("Ciudad: %s", nombreCiudades.get(camino.Tope())));
-                    camino.Desapilar();
-                }
-            } else {
-                System.out.println("No existe un camino entre las ciudades dadas.");
-            }
+        PilaTDA camino = new PilaLD();
+        camino.InicializarPila();
+        int distancia = grafo.Camino(ciudadA.hashCode(), ciudadB.hashCode(), camino);
+        System.out.println("Distancia total: " + distancia + " km");
+        while (!camino.PilaVacia()) {
+            System.out.println("Ciudad: " + getCiudadNombre(camino.Tope()));
+            camino.Desapilar();
         }
     }
 
-    private int CalcularCaminoAux(int ciudadA, int ciudadB, ConjuntoTDA visitados, PilaTDA camino, int distancia) {
-        if (ciudadA == ciudadB) {
-            camino.Apilar(ciudadA);
-            return distancia;
-        }
-        visitados.Agregar(ciudadA);
-        ConjuntoTDA adyacentes = mapa.VerticesAdyacentes(ciudadA);
-        while (!adyacentes.ConjuntoVacio()) {
-            int adyacente = adyacentes.Elegir();
-            if (!visitados.Pertenece(adyacente)) {
-                int resultado = CalcularCaminoAux(adyacente, ciudadB, visitados, camino, distancia + mapa.PesoArista(ciudadA, adyacente));
-                if (resultado != -1) {
-                    camino.Apilar(ciudadA);
-                    return resultado;
-                }
+    private String getCiudadNombre(int ciudadHash) {
+        for (int i = 0; i < provinciaIndex; i++) {
+            String nombre = provincias[i].getCiudadNombre(ciudadHash);
+            if (nombre != null) {
+                return nombre;
             }
-            adyacentes.Sacar(adyacente);
         }
-        return -1;
+        return null;
     }
 
     @Override
     public void CargarDatosDePrueba() {
         CargarProvincia("Buenos Aires");
+        CargarProvincia("Córdoba");
+        CargarProvincia("Salta");
+        CargarProvincia("Chubut");
+
         CargarCiudad("Buenos Aires", "La Plata");
         CargarCiudad("Buenos Aires", "Mar del Plata");
         CargarCiudad("Buenos Aires", "CABA");
         CargarCiudad("Buenos Aires", "Tandil");
-        
-        CargarProvincia("Córdoba");
+
         CargarCiudad("Córdoba", "Ciudad de Córdoba");
         CargarCiudad("Córdoba", "Río Cuarto");
         CargarCiudad("Córdoba", "Villa Carlos Paz");
 
-        CargarProvincia("Chubut");
-        CargarCiudad("Chubut", "Puerto Madryn");
-        CargarCiudad("Chubut", "Trelew");
-        CargarCiudad("Chubut", "Rawson");
-
-        CargarProvincia("Salta");
         CargarCiudad("Salta", "Cafayate");
 
-        CargarRuta("La Plata", "Mar del Plata", 400);
-        CargarRuta("Mar del Plata", "CABA", 400);
-        CargarRuta("CABA", "Tandil", 300);
-        CargarRuta("La Plata", "Tandil", 300);
-        CargarRuta("Ciudad de Córdoba", "Río Cuarto", 200);
-        CargarRuta("Río Cuarto", "Puerto Madryn", 1150);
-        CargarRuta("Villa Carlos Paz", "Ciudad de Córdoba", 40);
-        CargarRuta("Villa Carlos Paz", "Río Cuarto", 250);
-        CargarRuta("Villa Carlos Paz", "Trelew", 1400);
-        CargarRuta("Rawson", "Villa Carlos Paz", 1200);
-        CargarRuta("Rawson", "Cafayate", 2200);
-        CargarRuta("Rawson", "Trelew", 20);
+        CargarCiudad("Chubut", "Rawson");
+        CargarCiudad("Chubut", "Trelew");
+        CargarCiudad("Chubut", "Puerto Madryn");
+
+        CargarRuta("CABA", "Mar del Plata", 400);
+        CargarRuta("CABA", "La Plata", 60);
+        CargarRuta("CABA", "Tandil", 350);
+        CargarRuta("CABA", "Ciudad de Córdoba", 1300);
+        CargarRuta("Mar del Plata", "CABA", 500);
+        CargarRuta("Mar del Plata", "Ciudad de Córdoba", 1800);
+        CargarRuta("La Plata", "Ciudad de Córdoba", 1500);
+        CargarRuta("La Plata", "Rawson", 2700);
+        CargarRuta("Río Cuarto", "Ciudad de Córdoba", 200);
     }
 }

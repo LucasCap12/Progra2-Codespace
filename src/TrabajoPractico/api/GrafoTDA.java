@@ -17,6 +17,9 @@ public interface GrafoTDA {
     boolean ExistenArista(int v1, int v2);
     //siempre que el grafo este inicializado y exista la arista
     int PesoArista(int v1, int v2);
-    ConjuntoTDA VerticesAdyacentes(int v); //NO incluido en la guia teorica
 
+    ConjuntoTDA VerticesAdyacentes(int v); //NO incluidos en la guia teorica
+    ConjuntoTDA VerticesPredecesores(int v); // Nuevo método
+    // Definición del método Camino
+    int Camino(int origen, int destino, PilaTDA camino);
 }

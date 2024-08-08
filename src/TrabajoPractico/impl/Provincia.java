@@ -1,26 +1,33 @@
 package TrabajoPractico.impl;
 
 import TrabajoPractico.api.ConjuntoTDA;
+import TrabajoPractico.impl.ConjuntoLD;
 
 public class Provincia {
-    private String nombre;
-    private ConjuntoTDA ciudades;
+    public String nombre;
+    public ConjuntoTDA ciudades;
+    public String[] nombresCiudades;
+    public int indiceCiudad;
 
-    public Provincia(String nombre) {
-        this.nombre = nombre;
-        ciudades = new ConjuntoLD();  // Asegúrate de que ConjuntoLD implementa ConjuntoTDA
+    public void InicializarProvincia() {
+        nombre = "";
+        ciudades = new ConjuntoLD();
         ciudades.InicializarConjunto();
+        nombresCiudades = new String[100]; // Ajusta el tamaño según sea necesario
+        indiceCiudad = 0;
     }
 
-    public String getNombre() {
-        return nombre;
+    public void AgregarCiudad(int ciudadHash, String nombreCiudad) {
+        ciudades.Agregar(ciudadHash);
+        nombresCiudades[indiceCiudad++] = nombreCiudad;
     }
 
-    public ConjuntoTDA getCiudades() {
-        return ciudades;
-    }
-
-    public void agregarCiudad(String ciudad) {
-        ciudades.Agregar(ciudad.hashCode());
+    public String getCiudadNombre(int ciudadHash) {
+        for (int i = 0; i < indiceCiudad; i++) {
+            if (nombresCiudades[i].hashCode() == ciudadHash) {
+                return nombresCiudades[i];
+            }
+        }
+        return null;
     }
 }
